@@ -11,4 +11,4 @@ The source code and trained model parameters in this repository are made availab
 
 **The commercial use of this code and these models is forbidden.**
 
-Please also note that the model was trained using [RWRF dataset], provided by [CWA]. Please follow their data usage policy accordingly.
+Please also note that the model was trained using RWRF dataset, provided by CWA. Please follow their data usage policy accordingly.
