@@ -36,9 +36,12 @@ The public training contract contains exactly these three losses:
 For the current Pangu configuration, the CRPS-like loss and Spectral loss expect the active 224×224 data layout with
 13 upper-air levels and the configured surface channels.
 
-## From-scratch MAE training
+## Training
 
-Both checkpoint settings must be `null`:
+Edit [`config/finetune_multistep_pangu.yaml`](config/finetune_multistep_pangu.yaml) before each run.
+This is the default configuration loaded by `train.py`; no command-line overrides are required.
+
+For from-scratch training, keep both checkpoint settings as `null`:
 
 ```yaml
 lightning:
@@ -47,74 +50,34 @@ lightning:
   resume_from_checkpoint: null
 ```
 
-The canonical training configuration is
-[`config/finetune_multistep_pangu.yaml`](config/finetune_multistep_pangu.yaml).
-Its filename does not force fine-tuning; the two checkpoint settings determine whether training starts
-from scratch. The committed configuration is now the single-step, from-scratch MAE-loss path.
-
-### Minimum settings for single-step training
-
-The committed `finetune_multistep_pangu.yaml` uses:
-
-```yaml
-sequence_mode: false
-multi_step_forecast: 1
-output_itv:
-  hours: 1
-```
-
-These are the minimum settings for a single-step, from-scratch MAE-loss run:
+The committed configuration is a single-step run:
 
 ```yaml
 lightning:
-  loss: L1
   sequence_mode: false
   multi_step_forecast: 1
   output_itv:
     hours: 1
   model_native_interval:
     hours: 1
-  finetune_with_checkpoint: null
-  resume_from_checkpoint: null
 ```
 
-`calc_multihorizon_loss` and `detach_every_step` do not affect a one-step run.
+Choose one of the three supported losses by changing `lightning.loss` in the same file:
 
-Run from scratch with the committed configuration:
+```yaml
+loss: L1        # MAE loss
+# loss: MAECRPS # CRPS-like loss
+# loss: SPECTRUM # Spectral loss
+```
+
+After saving the configuration, run:
 
 ```bash
-conda run --live-stream -n dlamp python train.py \
-  lightning.loss=L1 \
-  lightning.finetune_with_checkpoint=null \
-  lightning.resume_from_checkpoint=null \
-  lightning.sequence_mode=false \
-  lightning.multi_step_forecast=1 \
-  lightning.output_itv.hours=1
+conda run --live-stream -n dlamp python train.py
 ```
 
-### Minimal smoke run
-
-This command checks configuration, data loading, model construction, and one train/validation pass.
-It uses one-step forecasting and a short date range only for a fast check; it is not the experiment setting.
-
-```bash
-conda run --live-stream -n dlamp python train.py \
-  lightning.loss=L1 \
-  lightning.finetune_with_checkpoint=null \
-  lightning.resume_from_checkpoint=null \
-  lightning.fast_dev_run=true \
-  lightning.workers=0 \
-  lightning.sampling_rate=1 \
-  lightning.sequence_mode=false \
-  lightning.multi_step_forecast=1 \
-  lightning.output_itv.hours=1 \
-  'data.start_time=2020-05-16 00:00' \
-  'data.end_time=2020-06-16 00:00'
-```
-
-`sampling_rate` controls how many time samples are selected; it does not reduce the memory required by
-one GPU batch. Set it according to the experiment protocol rather than using it as a GPU-memory control.
-
+`sampling_rate`, data dates, batch size, workers, and checkpoint settings should be changed directly in
+`config/finetune_multistep_pangu.yaml` according to the experiment.
 
 
 ## License
