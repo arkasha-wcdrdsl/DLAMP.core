@@ -1,0 +1,61 @@
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H:%M:%S}
+  job:
+    chdir: False
+  output_subdir: .hydra
+  job_logging:
+    root:
+      level: DEBUG
+    handlers:
+      console:
+        level: INFO
+      file:
+        level: DEBUG
+
+# data:
+#   use_Kth_hour_pred: null
+
+lightning:
+  multi_step_forecast: 1
+  output_itv: # pass this to tell datamanager to return multi-step forecast data
+    hours: 1
+  model_native_interval:
+    hours: 1 # pass this to build multi-step forecasting model backbone, keep consistent with [output_itv hours]/[model_native_interval hours]
+  loss: L1
+  sampling_rate: 1
+  batch_size: 1 # must be 1 !!!
+  workers: 4
+
+inference:
+  infer_type: "onnx"
+  onnx_path: "your onnx path"
+  # bdy_swap_method: null
+  bdy_swap_method:
+    name: "linear"
+    n_of_grid: 4
+  output_itv:
+    hours: 1
+  gpu_id: 0
+
+plot:
+  figure_columns: 49
+
+mp:
+  eval_cases:
+    - [2020, 5, 21, 17]
+    - [2021, 6, 4]
+    - [2022, 9, 11]
+    - [2022, 9, 12, 1]
+    - [2024, 10, 31, 4]
+  models:
+    - onnx_path: "your onnx path"
+      title: e1199
+
+
+defaults:
+  - data: rwrf_202511_224
+  - lightning: pangu_rwrf_202511_224
+  - model: pangu_rwrf_202511_224
+  - _self_
+  - override hydra/job_logging: default # default/disabled/custom

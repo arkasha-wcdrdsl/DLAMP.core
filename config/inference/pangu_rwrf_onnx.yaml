@@ -1,0 +1,8 @@
+infer_type: "onnx"
+onnx_path: "your onnx path"
+bdy_swap_method:
+  name: "linear"
+  n_of_grid: 4
+output_itv:
+  hours: 4
+gpu_id: 0

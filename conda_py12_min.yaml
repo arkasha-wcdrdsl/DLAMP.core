@@ -1,0 +1,36 @@
+name: dlamp
+channels:
+  - pytorch # For PyTorch and related packages.
+  - conda-forge # For scientific packages such as geopandas, cftime, rasterio, and xarray.
+  - defaults
+dependencies:
+  # Scientific computing / data processing
+  - python=3.12 # Recommended stable Python version.
+  - numpy
+  - xarray
+  - netCDF4
+  - geopandas
+  - rasterio
+  # - scipy
+  
+  # Machine learning / deep learning
+  - pytorch::pytorch # Use the PyTorch channel for current and stable packages.
+  - pytorch::torchvision
+  - pytorch::cpuonly # Remove this line to install a GPU build with CUDA/CUDA Toolkit.
+  - lightning # Lightning, related to or replacing pytorch-lightning.
+  - onnx
+  - onnxruntime
+  - einops
+  
+  # Tools / miscellaneous
+  - ipykernel # Convenient for Jupyter or IDE use.
+  - pydantic
+  - opencv # Commonly used for computer vision; pip or conda-forge are alternatives.
+  - hydra-core
+  - omegaconf
+  - wandb
+  
+  # pip packages (usually for packages unavailable in conda or requiring a newer version)
+  # - pip
+  # - pip:
+  #   - wandb

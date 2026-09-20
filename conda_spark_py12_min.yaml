@@ -1,0 +1,33 @@
+name: dlamp
+channels:
+  - nvidia
+  - pytorch
+  - conda-forge # For scientific packages such as geopandas, cftime, rasterio, and xarray.
+  - nodefaults
+dependencies:
+  # Scientific computing / data processing
+  - python=3.12 # Recommended stable Python version.
+  - numpy
+  - xarray
+  - netCDF4
+  - geopandas
+  - rasterio
+  
+  # Machine learning / deep learning
+  # - pytorch-cuda # Leave unspecified so onnxruntime=*=*_cuda resolves the dependency.
+  - torchvision
+  - lightning
+  - onnx
+  - onnxruntime=*=*cuda
+  - onnxscript
+  # - onnxruntime=1.22.0=py312heabd46b_200_cuda
+  - einops
+  
+  # Tools / miscellaneous
+  - ipykernel # Convenient for Jupyter or IDE use.
+  - pydantic
+  - opencv
+  - hydra-core
+  - omegaconf
+  - wandb
+  - cartopy

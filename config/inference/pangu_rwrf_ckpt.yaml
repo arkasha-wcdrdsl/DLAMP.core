@@ -1,0 +1,10 @@
+infer_type: "ckpt"
+best_ckpt: "your ckpt path"
+bdy_swap_method:
+  # name: "override"
+  # n_of_grid: 4
+  name: "linear"
+  n_of_grid: 4
+# bdy_swap_method: null
+output_itv:
+  hours: 4

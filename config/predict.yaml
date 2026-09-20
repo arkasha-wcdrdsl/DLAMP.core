@@ -1,0 +1,36 @@
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H:%M:%S}
+  job:
+    chdir: False
+  output_subdir: .hydra
+  job_logging:
+    root:
+      level: DEBUG
+    handlers:
+      console:
+        level: INFO
+      file:
+        level: DEBUG
+
+data:
+  use_Kth_hour_pred: 3
+
+lightning:
+  sampling_rate: 1
+  batch_size: 1 # must be 1 !!!
+  workers: 4
+  output_itv: # pass this to tell datamanager to return multi-step forecast data
+    hours: 1
+  multi_step_forecast: 1 # pass this to build multi-step forecasting model backbone, keep consistent with [output_itv hours]/[model_native_interval hours]
+  model_native_interval:
+    hours: 1
+
+defaults:
+  - data: rwrf_202512_224
+  - lightning: pangu_rwrf_202512_224
+  - model: pangu_rwrf_202512_224
+  - inference: pangu_rwrf_ckpt
+  - plot: pangu_rwrf
+  - _self_
+  - override hydra/job_logging: default # default/disabled/custom

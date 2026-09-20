@@ -1,0 +1,67 @@
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H:%M:%S}
+  job:
+    chdir: False
+  output_subdir: .hydra
+  job_logging:
+    root:
+      level: DEBUG
+    handlers:
+      console:
+        level: INFO
+      file:
+        level: DEBUG
+
+data:
+  use_Kth_hour_pred: 3
+
+lightning:
+  loss: SPECTRUM
+  sampling_rate: 1
+  batch_size: 1 # must be 1 !!!
+  workers: 4
+  output_itv: # pass this to tell datamanager to return multi-step forecast data
+    hours: 1
+  multi_step_forecast: 1 # pass this to build multi-step forecasting model backbone, keep consistent with [output_itv hours]/[model_native_interval hours]
+  # tune_step2_only: False
+  model_native_interval:
+    hours: 1
+
+inference:
+  infer_type: "ckpt"
+  best_ckpt: "your ckpt path"
+  bdy_swap_method:
+    # name: "override"
+    # n_of_grid: 4
+    name: "linear"
+    n_of_grid: 4
+  # bdy_swap_method: null
+
+model:
+  model_name: Pangu
+  model_label: fns315_binspectrum
+  # patch embedding
+  patch_size: [1, 2, 2]
+  smoothing_kernel_size: null
+  segmented_smooth_boundary_width: null
+  post_process_size: null
+  # earth layer
+  depths: [2, 2, 6]
+  # earth block
+  max_drop_path_ratio: 0
+  # earth attn 3d
+  heads: [8, 8, 16]
+  embed_dim: 256
+  dropout_rate: 0
+  window_size:
+    - [2, 7, 7]
+    - [2, 7, 7]
+    - [2, 7, 7]
+
+defaults:
+  - data: rwrf_202512_224
+  - lightning: pangu_rwrf_202512_224
+  - plot: pangu_rwrf
+  - _self_
+  - override hydra/job_logging: default # default/disabled/custom

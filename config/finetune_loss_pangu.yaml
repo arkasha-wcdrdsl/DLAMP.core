@@ -1,0 +1,50 @@
+# For more default settings and their description, please refer to:
+# `../site-package/hydra/conf/__init__.py`
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H:%M:%S} # where to save the logs
+  job:
+    chdir: False # whether to move to log folder
+  output_subdir: .hydra # .hydra log dir name
+  job_logging:
+    root:
+      level: DEBUG # 1st filter
+    handlers:
+      console:
+        level: INFO # 2nd filter
+      file:
+        level: DEBUG # 2nd filter
+  # verbose: [src.managers.data_manager]
+
+data:
+  start_time: "2018-01-01 00:00"
+  end_time: "2024-12-31 23:59"
+
+lightning:
+  output_itv: # pass this to tell datamanager to return multi-step forecast data
+    hours: 1
+  multi_step_forecast: 1 # pass this to build multi-step forecasting model backbone, keep consistent with output_itv hours
+  model_native_interval:
+    hours: 1
+  add_time_features: True
+  sampling_rate: 2
+  loss: MAECRPS
+  resume_from_checkpoint: null
+  finetune_with_checkpoint: "your ckpt path"
+  workers: 8 # mpi proc = 32 num_gpus = 8 max_user_processes = 2048
+  strategy: "auto"
+  batch_size: 1
+  log_image_every_n_epoch: 3
+  log_image_every_n_steps: null
+  optim_config:
+    name: AdamW
+    args:
+      lr: 3e-5
+      weight_decay: 5e-6
+
+defaults:
+  - data: rwrf_2026
+  - lightning: pangu_rwrf_202512_224
+  - model: pangu_rwrf_202512_224
+  - _self_
+  - override hydra/job_logging: default # default/disabled/custom

@@ -1,0 +1,124 @@
+# For more default settings and their description, please refer to:
+# `../site-package/hydra/conf/__init__.py`
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H:%M:%S} # where to save the logs
+  job:
+    chdir: False # whether to move to log folder
+  output_subdir: .hydra # .hydra log dir name
+  job_logging:
+    root:
+      level: DEBUG # 1st filter
+    handlers:
+      console:
+        level: INFO # 2nd filter
+      file:
+        level: DEBUG # 2nd filter
+  # verbose: [src.managers.data_manager]
+
+data:
+  start_time: "2018-01-01 00:00"
+  end_time: "2024-12-31 23:59"
+
+model:
+  model_name: Pangu
+  model_label: mae
+  max_drop_path_ratio: 0
+
+lightning:
+  ##################################################################
+  ### strategy — description:
+  ### Supports passing different training strategies with aliases (auto, ddp, fsdp, etc) as well as configured strategies.
+  ### auto means PyTorch Lightning will automatically select the best strategy based on the environment
+  ### (e.g., number of GPUs, TPUs, etc). Usually, it will select DDP for multi-GPU training and single GPU training for one GPU.
+  strategy: "auto"
+  ##################################################################
+  ### sequence_mode — description:
+  ### When True, the DataManager returns a sequence for multi-step forecasting.
+  ### False returns one input/target pair for single-step training.
+  sequence_mode: False
+  ##################################################################
+  ### calc_multihorizon_loss — description:
+  ### When True, the loss is calculated and averaged over all forecast horizons.
+  ### When False, only the loss at the final forecast horizon is used.
+  ### NOTE: Requires `multi_step_forecast > 1` and `sequence_mode = True` to be meaningful.
+  calc_multihorizon_loss: False
+  ##################################################################
+  ### detach_every_step — description:
+  ### Controls gradient flow in multi-step forecasting. It has no effect when
+  ### sequence_mode is False and multi_step_forecast is 1.
+  ### When True, detaches the computation graph after each step.
+  ### This prevents gradients from backpropagating through time and treats each forecast
+  ### step as an independent prediction.
+  ###   - Benefit: Reduces memory usage and can stabilize training.
+  ### When False, gradients flow through the entire sequence, allowing the
+  ### model to focus on fitting the final step.
+  ### NOTE: If `calc_multihorizon_loss` is False, setting this to `True` means
+  ### the model is only trained on the final forecast step.
+  ### NOTE: This setting is only meaningful when `multi_step_forecast > 1`.
+  detach_every_step: False
+  ##################################################################
+  ### output_itv — description:
+  ### Controls the interval between input and target data.
+  ### It must be consistent with multi_step_forecast * model_native_interval.
+  output_itv:
+    hours: 1
+  ##################################################################
+  ### multi_step_forecast — description:
+  ### Controls the number of steps to forecast.
+  ### This configuration is the single-step training path.
+  multi_step_forecast: 1
+  ##################################################################
+  ### model_native_interval — description:
+  ### The time interval (in hours) the model was originally trained to predict.
+  ### Used to calculate step counts for multi-step forecasting.
+  model_native_interval:
+    hours: 1
+  ##################################################################
+  add_time_features: True
+  ##################################################################
+  ### sampling_rate — description:
+  ### Controls the data sampling frequency.
+  ### e.g., 2 means every 2nd available sample is used.
+  sampling_rate: 5000
+  ##################################################################
+  ### loss — description:
+  ### Public choices: L1 (MAE loss), MAECRPS (CRPS-like loss), SPECTRUM (Spectral loss).
+  loss: L1
+  ##################################################################
+  ### resume_from_checkpoint — description:
+  ### Controls resuming of training from a checkpoint.
+  resume_from_checkpoint: null
+  # resume_from_checkpoint: your ckpt path
+  ##################################################################
+  ### finetune_with_checkpoint — description:
+  ### Controls loading of fine‑tune weights. MUST be set to null to disable loading fine‑tune weights.
+  ### WARNING: if `finetune_with_checkpoint` is not null while `resume_from_checkpoint` points to a different
+  ### checkpoint, the resume procedure may overwrite or conflict with fine‑tune loading and cause errors.
+  finetune_with_checkpoint: null
+  # finetune_with_checkpoint: your ckpt path
+  ##################################################################
+  workers: 4
+  batch_size: 1
+  log_image_every_n_epoch: 3
+  log_image_every_n_steps: null
+  optim_config:
+    name: AdamW
+    args:
+      lr: 3e-5
+      weight_decay: 5e-6
+  lr_schedule:
+    name: cosine
+    args:
+      warmup_steps: 3000
+  # total 2644 steps for batch=1, gpus=8
+  max_epochs: 800
+  min_epochs: 200
+  min_steps: 264400 # 500k
+
+defaults:
+  - data: rwrf_2026
+  - lightning: pangu_rwrf_202512_224
+  - model: pangu_rwrf_202512_224
+  - _self_
+  - override hydra/job_logging: default # default/disabled/custom

@@ -1,0 +1,50 @@
+name: dlamp
+channels:
+  - defaults   # Only used to install the Python base package.
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      # --- Scientific computing / data processing ---
+      - numpy
+      - xarray
+      - netCDF4
+      - scipy
+      - scikit-learn
+      - matplotlib
+
+      # --- Machine learning / deep learning ---
+      # CPU version
+      # - torch
+      # - torchvision
+
+      # Recommended GPU build with CUDA 12.1.
+      - torch
+      - torchvision
+      - torchaudio
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+
+      - lightning
+      - einops
+
+      # --- NVIDIA CUDA runtime (pip cannot install the complete toolkit) ---
+      - nvidia-cuda-runtime-cu12
+      - nvidia-cublas-cu12
+      - nvidia-cudnn-cu12>=9
+
+      # --- Tools / miscellaneous ---
+      - ipykernel
+      - pydantic
+      - hydra-core
+      - omegaconf
+      - wandb
+
+      # --- GIS / CV / remote sensing ---
+      # pip may have GDAL compilation issues; use conda-forge if installation fails.
+      - rasterio
+      - geopandas
+      - opencv-python
+
+      # --- ONNX ---
+      - onnx
+      - onnxruntime-gpu
