@@ -79,6 +79,8 @@ conda run --live-stream -n dlamp python train.py
 `sampling_rate`, data dates, batch size, workers, and checkpoint settings should be changed directly in
 `config/finetune_multistep_pangu.yaml` according to the experiment.
 
+## Inference
+If you want to try the inference, copy the link (https://drive.google.com/drive/folders/14XTZNsquLyU86kD8tRVIEWYmHNue4nK2?usp=sharing) to your own google drive.
 
 ## License
 
